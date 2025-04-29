@@ -17,8 +17,9 @@ RUN mkdir -p /home/app/text-generation-webui/.cache && chown -R $APP_UID:$APP_GI
 WORKDIR /home/app/text-generation-webui
 RUN git checkout local
 RUN --mount=type=cache,target=/root/.cache,sharing=locked GPU_CHOICE=A USE_CUDA118=FALSE LAUNCH_AFTER_INSTALL=FALSE INSTALL_EXTENSIONS=TRUE ./start_linux.sh --verbose
-COPY CMD_FLAGS.txt /home/app/text-generation-webui/
 EXPOSE ${CONTAINER_PORT:-7860} ${CONTAINER_API_PORT:-5000} ${CONTAINER_API_STREAM_PORT:-5005}
 WORKDIR /home/app/text-generation-webui
 # set umask to ensure group read / write at runtime
+COPY CMD_FLAGS.txt /home/app/text-generation-webui/user_data
+RUN chown -R $APP_UID:$APP_GID /home/app/text-generation-webui/user_data
 CMD umask 0002 && export HOME=/home/app/text-generation-webui && ./start_linux.sh --listen
